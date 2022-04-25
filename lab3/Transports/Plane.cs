@@ -4,12 +4,8 @@ namespace lab3.Transports
 {
     public class Plane: Transport
     {
-        public Plane(string model, int power, int capacity)
+        static Plane()
         {
-            this.capacity = capacity;
-            this.model = model;
-            this.power = power;
-
             capacityType = CapacityType.Kilogram;
             powerType = EnginePowerType.HorsePowers;
         }

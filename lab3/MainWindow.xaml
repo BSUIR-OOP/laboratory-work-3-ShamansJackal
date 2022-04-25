@@ -7,6 +7,41 @@
         mc:Ignorable="d"
         Title="MainWindow" Height="450" Width="800">
     <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="200"/>
+            <ColumnDefinition Width="80"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+
+        <ListView x:Name="listView" DisplayMemberPath="model"></ListView>
+        <StackPanel Grid.Column="1">
+            <Label Content="Model:"></Label>
+            <Label Content="Power:"></Label>
+            <Label Content="Capacity:"></Label>
+        </StackPanel>
+        <StackPanel Grid.Column="2">
+            <TextBox Margin="5" x:Name="modelBox"></TextBox>
+            <TextBox Margin="5" x:Name="powerBox"></TextBox>
+            <TextBox Margin="5" x:Name="capacBox"></TextBox>
+            <ComboBox Margin="5" Name="SelectClass"></ComboBox>
+            <Image x:Name="prewievImg" Height="200" Source="F:\История\23.10.2019\KatePhotos\20190417_204033.jpg"></Image>
+            
+            <DockPanel VerticalAlignment="Top" LastChildFill="True">
+                <Button x:Name="OpenFileBTN" Padding="3" Margin="4" DockPanel.Dock="Right"  Content="Open" Click="InputFile_Click" Tag="input"/>
+                <!--<Button x:Name="UpdBtn" Padding="3" Margin="4" DockPanel.Dock="Right" Click="UpdBtn_Click" Content="Update"/>-->
+                <TextBox Margin="4" x:Name="OutputFile" FontSize="16" Text="{Binding ElementName=OpenFileBTN, Path=Tag}" />
+            </DockPanel>
+
+            <StackPanel Orientation="Horizontal">
+                <Button Margin="4" Padding="3" Content="Create" Click="Button_Click"></Button>
+                <Button Margin="4" Padding="3" Content="Update" Click="Button_Click" Tag="upd"></Button>
+                <Button Margin="4" Padding="3" Content="Delete"></Button>
+                <TextBlock FontSize="19" Text="|                |"></TextBlock>
+                <Button Margin="4" Padding="3" Content="Ser" Click="SerializeAct"></Button>
+                <Button Margin="4" Padding="3" Content="Des"></Button>
+            </StackPanel>
+        </StackPanel>
+
 
     </Grid>
 </Window>

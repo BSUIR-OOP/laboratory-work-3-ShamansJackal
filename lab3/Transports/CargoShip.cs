@@ -9,12 +9,8 @@ namespace lab3.Transports
 {
     public class CargoShip : Transport
     {
-        public CargoShip(string model, int power, int capacity)
+        static CargoShip()
         {
-            this.capacity = capacity;
-            this.model = model;
-            this.power = power;
-
             capacityType = CapacityType.Kilogram;
             powerType = EnginePowerType.HorsePowers;
         }

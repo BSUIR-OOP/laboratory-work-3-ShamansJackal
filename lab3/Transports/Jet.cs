@@ -1,15 +1,12 @@
 ﻿using lab3.Enum;
+using System;
 
 namespace lab3.Transports
 {
-    public class Jet : Transport
+    public class Jet : Transport, ICloneable
     {
-        public Jet(string model, int power, int capacity)
+        static Jet()
         {
-            this.capacity = capacity;
-            this.model = model;
-            this.power = power;
-
             capacityType = CapacityType.People;
             powerType = EnginePowerType.KgS;
         }

@@ -4,13 +4,9 @@ namespace lab3.Transports
 {
     public class Tanker: Transport
     {
-        public Tanker(string model, int power, int capacity)
+        static Tanker()
         {
-            this.capacity = capacity;
-            this.model = model;
-            this.power = power;
-
-            capacityType = CapacityType.Kilogram;
+            capacityType = CapacityType.Liter;
             powerType = EnginePowerType.HorsePowers;
         }
 
