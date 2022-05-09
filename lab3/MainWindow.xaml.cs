@@ -1,4 +1,6 @@
-﻿using lab3.Transports;
+﻿using lab3.Service;
+using lab3.Struct;
+using lab3.Transports;
 using Microsoft.Win32;
 using System;
 using System.Collections.Generic;
@@ -23,7 +25,8 @@ namespace lab3
     /// </summary>
     public partial class MainWindow : Window
     {
-        private List<Transport> _transports = new();
+        public string Text_str { get; set; } = "dsa";
+        public ListOfTransports _transports { get; set; } = new();
         private byte[] file;
 
         private List<Transport> _availbleType = new()
@@ -59,12 +62,12 @@ namespace lab3
                         SourceStream.Read(file, 0, (int)SourceStream.Length);
                     }
 
-                    //BitmapImage logo = new BitmapImage();
-                    //logo.BeginInit();
-                    //logo.UriSource = new Uri(filename);
-                    //logo.EndInit();
+                    BitmapImage bi = new BitmapImage();
+                    bi.BeginInit();
+                    bi.StreamSource = new MemoryStream(file);
+                    bi.EndInit();
 
-                    //prewievImg.Source = logo;
+                    prewievImg.Source = bi;
                 }
             }
         }
@@ -72,45 +75,41 @@ namespace lab3
 
         private async void Button_Click(object sender, RoutedEventArgs e)
         {
-            Transport newTrs = SelectClass.SelectedItem as Transport;
+            Transport newTrs = (Transport)SelectClass.SelectedItem;
 
+            newTrs = (Transport)newTrs.Clone();
             newTrs.model = modelBox.Text; 
             newTrs.power = int.Parse(powerBox.Text); 
             newTrs.capacity = int.Parse(capacBox.Text);
             newTrs.bin = file;
 
-            if (((Button)sender).Tag == "upd")
+            if (((Button)sender).Tag.ToString() == "upd")
                 _transports[listView.SelectedIndex] = newTrs;
             else
                 _transports.Add(newTrs);
+
+            listView.Items.Refresh();
         }
 
         private void DeserialzeAct(object sender, RoutedEventArgs e)
         {
-            _transports = JsonService.FromFile("data.json");
-        }
+            var jsonTree = JsonTokenizer.ToJsonTree(File.ReadAllText("data.json"));
+            _transports = (ListOfTransports)_transports.FromJson(jsonTree);
 
-        private static BitmapImage LoadImage(byte[] imageData)
-        {
-            if (imageData == null || imageData.Length == 0) return null;
-            var image = new BitmapImage();
-            using (var mem = new MemoryStream(imageData))
-            {
-                mem.Position = 0;
-                image.BeginInit();
-                image.CreateOptions = BitmapCreateOptions.PreservePixelFormat;
-                image.CacheOption = BitmapCacheOption.OnLoad;
-                image.UriSource = null;
-                image.StreamSource = mem;
-                image.EndInit();
-            }
-            image.Freeze();
-            return image;
+            listView.ItemsSource = _transports;
+            listView.Items.Refresh();
         }
 
         private void SerializeAct(object sender, RoutedEventArgs e)
         {
-            JsonService.ToFile(_transports, "data.json");
+            var json = _transports.ToJson();
+            File.WriteAllText("data.json",json);
+        }
+
+        private void Button_Click_1(object sender, RoutedEventArgs e)
+        {
+            _transports.RemoveAt(listView.SelectedIndex);
+            listView.Items.Refresh();
         }
     }
 }
