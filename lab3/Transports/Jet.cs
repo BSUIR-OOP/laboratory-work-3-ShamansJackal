@@ -1,15 +1,7 @@
-﻿using lab3.Enum;
-using System;
-
-namespace lab3.Transports
+﻿namespace lab3.Transports
 {
-    public class Jet : Transport, ICloneable
+    public class Jet : Transport
     {
-        static Jet()
-        {
-            capacityType = CapacityType.People;
-            powerType = EnginePowerType.KgS;
-        }
 
         public override string Move() => $"Jet({model}) flying in sky";
         public string MoveAtSonicSpeed() => @"
