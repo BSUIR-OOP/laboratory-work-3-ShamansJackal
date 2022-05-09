@@ -10,11 +10,18 @@ namespace lab3.Service
 {
     public static class JsonTokenizer
     {
+        public static JsonToken ToJsonTree(string json)
+        {
+            var tokens = Tokenize(json);
+            return BuildTree(tokens);
+        }
+
+
         // State A - outside " "
         // State B - inside ""
         // State C - after /
 
-
+        // DFA, splite json to list of tokens
         private static List<JsonToken> Tokenize(string json)
         {
             List<JsonToken> result = new List<JsonToken>();
@@ -26,7 +33,7 @@ namespace lab3.Service
                 switch (state)
                 {
                     case 'A':
-                        if (symb == ' ' || symb == '\t' || symb == '\n')
+                        if (symb == '\n' || char.IsWhiteSpace(symb)) //skip whitespace
                         {
                             if (begPos != endPos)
                                 result.Add(new JsonToken() { Content = json[begPos..endPos], Type = "S" });
@@ -48,7 +55,7 @@ namespace lab3.Service
                     case 'B':
                         if(symb == '"')
                         {
-                            result.Add(new JsonToken() { Content = json[~-begPos..endPos], Type = "S" });
+                            result.Add(new JsonToken() { Content = json[-~begPos..endPos], Type = "S" });
                             state = 'A';
                             begPos = -~endPos;
                         }else if(symb == '\\')
@@ -60,7 +67,7 @@ namespace lab3.Service
                         if (symb == '"' || symb == '\\')
                             state = 'B';
                         else
-                            throw new Exception("syntax error");
+                            throw new Exception("Syntax error");
                         break;
                 }
                 endPos++;
@@ -71,10 +78,12 @@ namespace lab3.Service
         //Symantic tree reducer rules
         // S:[SDA] -> P(dict Pair)
         // {P(,P)*} -> D(Dict)
-        // []
+        // [[SDA](,[SDA])*] -> A(Array)
 
+        // Build symantic tree from list of tokens
         private static JsonToken BuildTree(List<JsonToken> tokens)
         {
+            //Reduce list of tokens to one root JSON token
             while(tokens.Count > 1)
             {
                 string code = string.Join("", tokens.Select(x => x.Type));
@@ -120,12 +129,7 @@ namespace lab3.Service
             tokens.Insert(ind, newElem);
         }
 
-        public static JsonToken ToJsonTree(string json)
-        {
-            var tokens = Tokenize(json);
-            return BuildTree(tokens);
-        }
-
+        // Work with tokens such as [ ] { } , :
         private static void AddOneSymbToken(this List<JsonToken> tokens, char symb) => tokens.Add(new JsonToken() { Content = symb.ToString(), Type = symb.ToString() });
     }
 }
