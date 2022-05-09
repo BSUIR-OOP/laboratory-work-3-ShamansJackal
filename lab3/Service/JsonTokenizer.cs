@@ -29,13 +29,13 @@ namespace lab3.Service
                         if (symb == ' ' || symb == '\t' || symb == '\n')
                         {
                             if (begPos != endPos)
-                                result.Add(new JsonToken() { Content = json[begPos..endPos], Type = "K" });
+                                result.Add(new JsonToken() { Content = json[begPos..endPos], Type = "S" });
                             begPos = -~endPos;
                         }
                         else if (",{}[]:".Contains(symb))
                         {
                             if (begPos != endPos)
-                                result.Add(new JsonToken() { Content = json[begPos..endPos], Type = "K" });
+                                result.Add(new JsonToken() { Content = json[begPos..endPos], Type = "S" });
                             result.AddOneSymbToken(symb);
                             begPos = -~endPos;
                         }
@@ -48,12 +48,19 @@ namespace lab3.Service
                     case 'B':
                         if(symb == '"')
                         {
-                            result.Add(new JsonToken() { Content = json[begPos..-~endPos], Type = "S" });
+                            result.Add(new JsonToken() { Content = json[~-begPos..endPos], Type = "S" });
                             state = 'A';
                             begPos = -~endPos;
+                        }else if(symb == '\\')
+                        {
+                            state = 'C';
                         }
                         break;
-                    default:
+                    case 'C':
+                        if (symb == '"' || symb == '\\')
+                            state = 'B';
+                        else
+                            throw new Exception("syntax error");
                         break;
                 }
                 endPos++;
@@ -62,7 +69,7 @@ namespace lab3.Service
         }
 
         //Symantic tree reducer rules
-        // K:[SKDA] -> P(dict Pair)
+        // S:[SDA] -> P(dict Pair)
         // {P(,P)*} -> D(Dict)
         // []
 
@@ -71,9 +78,9 @@ namespace lab3.Service
             while(tokens.Count > 1)
             {
                 string code = string.Join("", tokens.Select(x => x.Type));
-                if (Regex.IsMatch(code, @"[SK]:[SKDA]"))
+                if (Regex.IsMatch(code, @"S:[SDA]"))
                 {
-                    var match = Regex.Match(code, @"[SK]:[SKDA]");
+                    var match = Regex.Match(code, @"S:[SDA]");
                     var subList = tokens.Skip(match.Index).Take(match.Length).ToList();
 
                     var newToken = new JsonToken() { Type = "P", Childs = subList };
@@ -89,9 +96,9 @@ namespace lab3.Service
                         newToken.ChildDict[subList[i].Childs[0].Content] = subList[i].Childs[2];
                     tokens.ReduceList(match.Index, match.Length, newToken);
                 }
-                else if(Regex.IsMatch(code, @"\[[SKDA](?>,[SKDA])*\]"))
+                else if(Regex.IsMatch(code, @"\[[SDA](?>,[SDA])*\]"))
                 {
-                    var match = Regex.Match(code, @"\[[SKDA](?>,[SKDA])*\]");
+                    var match = Regex.Match(code, @"\[[SDA](?>,[SDA])*\]");
                     var subList = tokens.Skip(match.Index).Take(match.Length).ToList();
 
                     var newToken = new JsonToken() { Type = "A", Childs = new List<JsonToken>()};
